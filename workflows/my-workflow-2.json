@@ -1,0 +1,137 @@
+{
+  "active": false,
+  "connections": {
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "index": 0,
+            "node": "AI Agent",
+            "type": "ai_tool"
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "index": 0,
+            "node": "AI Agent",
+            "type": "ai_languageModel"
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "index": 0,
+            "node": "AI Agent",
+            "type": "ai_memory"
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "AI Agent",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "isArchived": false,
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "name": "When chat message received",
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "webhookId": "7c43b300-2d2c-4efb-aab6-6d5c2bccf7e3"
+    },
+    {
+      "name": "AI Agent",
+      "parameters": {
+        "options": {
+          "systemMessage": "Eres un asistente profesional en responder questiones sobre inteligencia artificial (IA). Para ello utilizara tu herramienta que tienes conectada como base de datos.\nExclusivamente responderas questiones sobre inteligencia artificial nada ms."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2
+    },
+    {
+      "name": "HTTP Request",
+      "parameters": {
+        "jsonBody": "{\n  \"query\": \"hola\",\n  \"response_type\": \"string\"\n}\n",
+        "jsonHeaders": "{\n  \"accept\": \"application/json\",\n  \"content-type\": \"application/json\",\n  \"authorization\": \"Bearer 20058522\"\n}\n",
+        "method": "POST",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 180
+        },
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "specifyHeaders": "json",
+        "toolDescription": "Utiliza esta herramienta como base de datos para responder a las preguntas que te hagan sobre IA.",
+        "url": "https://lightrag-1-g9rn.onrender.com/query"
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2
+    },
+    {
+      "credentials": {
+        "openAiApi": {
+          "id": "vHAQ3s2QFMjVRdaz",
+          "name": "OpenAi account"
+        }
+      },
+      "name": "OpenAI Chat Model",
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "cachedResultName": "gpt-4o-mini",
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2
+    },
+    {
+      "name": "Simple Memory",
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "createdAt": "2025-09-10T14:47:37.679Z",
+      "projectId": "M3s0TPMuzmMgAN7B",
+      "role": "workflow:owner",
+      "updatedAt": "2025-09-10T14:47:37.679Z",
+      "workflowId": "v0oX9cxnDVu6kGgR"
+    }
+  ],
+  "tags": [],
+  "triggerCount": 0
+}
