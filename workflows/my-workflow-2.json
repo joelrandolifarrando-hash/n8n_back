@@ -50,13 +50,24 @@
   "name": "My workflow 2",
   "nodes": [
     {
-      "name": "When chat message received",
+      "credentials": {
+        "openAiApi": {
+          "id": "vHAQ3s2QFMjVRdaz",
+          "name": "OpenAi account"
+        }
+      },
+      "name": "OpenAI Chat Model",
       "parameters": {
+        "model": {
+          "__rl": true,
+          "cachedResultName": "gpt-4o-mini",
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
         "options": {}
       },
-      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
-      "typeVersion": 1.3,
-      "webhookId": "7c43b300-2d2c-4efb-aab6-6d5c2bccf7e3"
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2
     },
     {
       "name": "AI Agent",
@@ -93,30 +104,19 @@
       "typeVersion": 4.2
     },
     {
-      "credentials": {
-        "openAiApi": {
-          "id": "vHAQ3s2QFMjVRdaz",
-          "name": "OpenAi account"
-        }
-      },
-      "name": "OpenAI Chat Model",
-      "parameters": {
-        "model": {
-          "__rl": true,
-          "cachedResultName": "gpt-4o-mini",
-          "mode": "list",
-          "value": "gpt-4o-mini"
-        },
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1.2
-    },
-    {
       "name": "Simple Memory",
       "parameters": {},
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3
+    },
+    {
+      "name": "When chat message received",
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "webhookId": "7c43b300-2d2c-4efb-aab6-6d5c2bccf7e3"
     }
   ],
   "pinData": {},
