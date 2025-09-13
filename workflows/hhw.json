@@ -1,0 +1,32 @@
+{
+  "active": false,
+  "connections": {},
+  "isArchived": false,
+  "name": "hhw",
+  "nodes": [
+    {
+      "name": "On form submission",
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "webhookId": "fbc6d6bd-81a5-4f52-9c4f-090867f37e91"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "createdAt": "2025-09-13T00:23:54.129Z",
+      "projectId": "M3s0TPMuzmMgAN7B",
+      "role": "workflow:owner",
+      "updatedAt": "2025-09-13T00:23:54.129Z",
+      "workflowId": "C9gL01zzXhW6R5G2"
+    }
+  ],
+  "tags": [],
+  "triggerCount": 0
+}
