@@ -1,0 +1,29 @@
+{
+  "active": false,
+  "connections": {},
+  "isArchived": false,
+  "name": "prueba",
+  "nodes": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "createdAt": "2025-09-13T00:37:30.279Z",
+      "projectId": "M3s0TPMuzmMgAN7B",
+      "role": "workflow:owner",
+      "updatedAt": "2025-09-13T00:37:30.279Z",
+      "workflowId": "iRx10V0toUqLdMoe"
+    }
+  ],
+  "tags": [],
+  "triggerCount": 0
+}
