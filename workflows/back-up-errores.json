@@ -23,6 +23,17 @@
         ]
       ]
     },
+    "Edit a file1": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Loop Over Items1",
+            "type": "main"
+          }
+        ]
+      ]
+    },
     "Get a file1": {
       "main": [
         [
@@ -49,13 +60,13 @@
       "main": [
         [
           {
-            "index": 1,
-            "node": "Merge1",
+            "index": 0,
+            "node": "Get a file1",
             "type": "main"
           },
           {
-            "index": 0,
-            "node": "Get a file1",
+            "index": 1,
+            "node": "Merge1",
             "type": "main"
           }
         ],
@@ -106,15 +117,21 @@
         [
           {
             "index": 0,
-            "node": "Loop Over Items1",
+            "node": "Create a file",
             "type": "main"
           }
         ],
-        [],
         [
           {
             "index": 0,
-            "node": "Create a file",
+            "node": "Edit a file1",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Loop Over Items1",
             "type": "main"
           }
         ]
@@ -164,29 +181,63 @@
       "webhookId": "6c02b6cd-2487-43dd-b220-a966bcd42cda"
     },
     {
-      "name": "Schedule Trigger1",
-      "parameters": {
-        "rule": {
-          "interval": [
-            {
-              "field": "hours",
-              "hoursInterval": 12
-            }
-          ]
+      "credentials": {
+        "githubApi": {
+          "id": "0oW4lU9Qr31YmzID",
+          "name": "GitHub account"
         }
       },
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1.2
+      "name": "Edit a file1",
+      "parameters": {
+        "commitMessage": "=feat(n8n): add {{ $json[\"filePath\"] }}",
+        "fileContent": "={{ $json[\"n8n_data_stringy\"] }}",
+        "filePath": "={{ $json[\"filePath\"] }}",
+        "operation": "edit",
+        "owner": {
+          "__rl": true,
+          "mode": "name",
+          "value": "joelrandolifarrando-hash"
+        },
+        "repository": {
+          "__rl": true,
+          "mode": "name",
+          "value": "n8n_back"
+        },
+        "resource": "file"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "webhookId": "6c02b6cd-2487-43dd-b220-a966bcd42cda"
     },
     {
-      "name": "Variables1",
-      "parameters": {
-        "jsonOutput": "{\n  \"repo\": {\n    \"owner\": \"joelrandolifarrandoli-hash\",\n    \"name\": \"n8n_back\",\n    \"branch\": \"main\",\n    \"path\": \"workflows\"\n  }\n}\n",
-        "mode": "raw",
-        "options": {}
+      "credentials": {
+        "githubApi": {
+          "id": "0oW4lU9Qr31YmzID",
+          "name": "GitHub account"
+        }
       },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4
+      "name": "Get a file1",
+      "onError": "continueRegularOutput",
+      "parameters": {
+        "additionalParameters": {},
+        "asBinaryProperty": false,
+        "filePath": "={{ $('Variables1').item.json.repo.path }}",
+        "operation": "get",
+        "owner": {
+          "__rl": true,
+          "mode": "name",
+          "value": "joelrandolifarrando-hash"
+        },
+        "repository": {
+          "__rl": true,
+          "mode": "name",
+          "value": "n8n_back"
+        },
+        "resource": "file"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "webhookId": "4877ee34-bc78-45fa-9471-7f325b186b4c"
     },
     {
       "credentials": {
@@ -204,6 +255,14 @@
       "typeVersion": 1
     },
     {
+      "name": "Code in JavaScript1",
+      "parameters": {
+        "jsCode": "// ========== CONFIG ==========\nconst BRANCH = 'main';\n\n// ========== Utils ==========\nfunction isObject(v){ return v && typeof v === 'object' && !Array.isArray(v); }\nfunction looksLikeWorkflow(o){ return o && isObject(o) && Array.isArray(o.nodes) && isObject(o.connections); }\nfunction tryParseJson(s){ try { return JSON.parse(s); } catch { return null; } }\nfunction tryParseBase64Json(s){\n  try {\n    const txt = Buffer.from(String(s).replace(/\\s+/g,''), 'base64').toString('utf8');\n    return JSON.parse(txt);\n  } catch { return null; }\n}\nfunction slug(s){\n  return String(s||'workflow')\n    .normalize('NFD').replace(/[\\u0300-\\u036f]/g,'')\n    .replace(/[^a-zA-Z0-9-_]+/g,'-')\n    .replace(/-+/g,'-')\n    .replace(/^-|-$/g,'')\n    .toLowerCase();\n}\n\n// Campos volátiles típicos\nconst VOLATILE_TOP = new Set(['id','createdAt','updatedAt','versionId','meta','hash','staticData']);\nconst VOLATILE_NODE = new Set(['id','createdAt','updatedAt','position','notes','notesInFlow']);\n\nfunction deepSort(obj){\n  if (Array.isArray(obj)) return obj.map(deepSort);\n  if (!isObject(obj)) return obj;\n  const out = {};\n  for (const k of Object.keys(obj).sort()) out[k] = deepSort(obj[k]);\n  return out;\n}\nfunction stripVolatile(wf){\n  if (!wf || !isObject(wf)) return wf;\n  const c = JSON.parse(JSON.stringify(wf));\n  for (const k of VOLATILE_TOP) delete c[k];\n  if (Array.isArray(c.nodes)){\n    c.nodes = c.nodes.map(n=>{\n      const nn = {...n};\n      for (const k of VOLATILE_NODE) delete nn[k];\n      if (nn.credentials && isObject(nn.credentials)) nn.credentials = deepSort(nn.credentials);\n      if (nn.parameters) nn.parameters = deepSort(nn.parameters);\n      return nn;\n    });\n  }\n  return deepSort(c);\n}\nfunction same(a,b){ return JSON.stringify(a) === JSON.stringify(b); }\n\n// Busca un workflow local en profundidad\nfunction findWorkflowDeep(obj){\n  const stack = [{v: obj, p: '$'}];\n  while (stack.length){\n    const {v,p} = stack.pop();\n    if (looksLikeWorkflow(v)) return {wf: v, path: p};\n    if (Array.isArray(v)) v.forEach((el,i)=> stack.push({v: el, p: `${p}[${i}]`}));\n    else if (isObject(v)) for (const [k,val] of Object.entries(v)) stack.push({v: val, p: `${p}.${k}`});\n  }\n  return {wf: null, path: null};\n}\n\n// ---- Extracción REMOTO: JSON, Binary y fallback solo-`sha` ----\nfunction extractRemoteFromJson(root){\n  // a) Respuesta típica /contents { content:<b64>, encoding:'base64', sha, path }\n  const stack = [root];\n  while (stack.length){\n    const v = stack.pop();\n    if (v && typeof v === 'object' && !Array.isArray(v)){\n      if (typeof v.content === 'string' && /base64/i.test(v.encoding||'')){\n        const parsed = tryParseBase64Json(v.content);\n        if (looksLikeWorkflow(parsed)){\n          return { wf: parsed, sha: typeof v.sha==='string'? v.sha : null, path: v.path || null, source: 'json.content(base64)' };\n        }\n      }\n      for (const val of Object.values(v)) stack.push(val);\n    }\n  }\n  return { wf: null, sha: null, path: null, source: null };\n}\n\nfunction extractRemoteFromBinary(binary){\n  if (!binary || !isObject(binary)) return { wf:null, sha:null, path:null, source:null };\n  for (const [k,b] of Object.entries(binary)){\n    if (b && typeof b.data === 'string'){\n      const parsed = tryParseBase64Json(b.data);\n      if (looksLikeWorkflow(parsed)) return { wf: parsed, sha: null, path: null, source: `binary.${k}.data` };\n    }\n  }\n  return { wf:null, sha:null, path:null, source:null };\n}\n\n// Fallback: si no pudimos leer content, al menos detecta sha+path para \"existe\"\nfunction extractShaPathOnly(root){\n  let found = { sha:null, path:null, source:null };\n  const hex40 = /^[0-9a-f]{40}$/i;\n  const stack = [root];\n  while (stack.length){\n    const v = stack.pop();\n    if (v && typeof v === 'object' && !Array.isArray(v)){\n      if (typeof v.sha==='string' && hex40.test(v.sha)){\n        // intenta inferir path\n        const p = typeof v.path==='string' ? v.path : null;\n        found = { sha: v.sha, path: p, source: 'json.shaOnly' };\n        if (p) return found;\n      }\n      for (const val of Object.values(v)) stack.push(val);\n    }\n  }\n  return found;\n}\n\n// ========== AGRUPADOR POR filePath ==========\nconst buckets = new Map(); // key=filePath → { local, remote, sha, filePath }\nfunction ensureBucket(key){\n  if (!buckets.has(key)) buckets.set(key, { local:null, remote:null, sha:null, filePath:key });\n  return buckets.get(key);\n}\n\n// 1) Recolectar info de TODOS los items (vengan de Get, Loop, Merge…)\nfor (const item of items){\n  const j = item.json || {};\n\n  // LOCAL\n  let local = j.localWorkflow || j.workflow || (looksLikeWorkflow(j) ? j : null);\n  if (!local){\n    const fl = findWorkflowDeep(j);\n    local = fl.wf;\n  }\n  if (local){\n    const nombre = slug(local.name || local.id || 'workflow');\n    const filePath = `workflows/${nombre}.json`;\n    const normLocal = stripVolatile(local);\n    const b = ensureBucket(filePath);\n    b.local = normLocal;\n    b.filePath = filePath;\n  }\n\n  // REMOTO (JSON)\n  const rj = extractRemoteFromJson(j);\n  if (rj.wf){\n    const filePath = rj.path || (()=>{\n      const nombre = slug(rj.wf.name || rj.wf.id || 'workflow');\n      return `workflows/${nombre}.json`;\n    })();\n    const b = ensureBucket(filePath);\n    b.remote = stripVolatile(rj.wf);\n    if (rj.sha) b.sha = rj.sha;\n    b.filePath = filePath;\n  } else {\n    // REMOTO (Binary)\n    const rb = extractRemoteFromBinary(item.binary);\n    if (rb.wf){\n      const filePath = rb.path || (()=>{\n        const nombre = slug(rb.wf.name || rb.wf.id || 'workflow');\n        return `workflows/${nombre}.json`;\n      })();\n      const b = ensureBucket(filePath);\n      b.remote = stripVolatile(rb.wf);\n      b.filePath = filePath;\n    } else {\n      // FALLBACK: solo sha/path\n      const sp = extractShaPathOnly(j);\n      if (sp.sha){\n        const filePath = sp.path || (()=>{\n          // si no sabemos el path remoto, intenta inferirlo del local ya recolectado\n          // (si no existe aún, lo fijamos a null y más tarde usaremos el del local)\n          const firstLocal = [...buckets.values()].find(x=>x.local)?.filePath || null;\n          return firstLocal;\n        })();\n        if (filePath){\n          const b = ensureBucket(filePath);\n          if (!b.sha) b.sha = sp.sha;\n          if (!b.filePath) b.filePath = filePath;\n        }\n      }\n    }\n  }\n}\n\n// 2) Salida: decisión 0/1/2\nconst output = [];\nfor (const [key,b] of buckets){\n  if (!b.local){\n    output.push({ json: { accion: -1, estado: 'error', mensaje: 'No se detectó workflow LOCAL', filePath: key } });\n    continue;\n  }\n  const n8n_data_stringy = Buffer.from(JSON.stringify(b.local, null, 2)).toString('base64');\n  const shaOk = (typeof b.sha === 'string') && /^[0-9a-f]{40}$/i.test(b.sha);\n\n  let accion, estado, motivo;\n  if (b.remote){\n    if (same(b.local, b.remote)){\n      accion = 0; estado = 'igual'; motivo = 'local==remoto';\n    } else if (shaOk){\n      accion = 1; estado = 'diferente'; motivo = 'diff-con-sha';\n    } else {\n      accion = 2; estado = 'crear'; motivo = 'diff-sin-sha';\n    }\n  } else if (shaOk){\n    // No pudimos leer el content remoto (truncado?), pero SÍ sabemos que existe (sha). Edita.\n    accion = 1; estado = 'editar_sin_diff'; motivo = 'sha-sin-content';\n  } else {\n    accion = 2; estado = 'crear'; motivo = 'no-remote';\n  }\n\n  output.push({\n    json: {\n      accion, estado, motivo,\n      filePath: b.filePath || key,\n      n8n_data_stringy,\n      sha: b.sha || undefined,\n      branch: BRANCH,\n      debug: {\n        haveRemote: !!b.remote,\n        haveSha: !!b.sha,\n      }\n    }\n  });\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    },
+    {
       "name": "Loop Over Items1",
       "parameters": {
         "options": {}
@@ -212,24 +271,31 @@
       "typeVersion": 3
     },
     {
-      "name": "Replace Me1",
-      "parameters": {},
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1
-    },
-    {
       "name": "Merge1",
       "parameters": {},
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2
     },
     {
-      "name": "Code in JavaScript1",
+      "name": "Replace Me1",
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1
+    },
+    {
+      "name": "Schedule Trigger1",
       "parameters": {
-        "jsCode": "// === Helpers ===\nfunction isObject(v){ return v && typeof v === 'object' && !Array.isArray(v); }\nfunction looksLikeWorkflow(o){ return o && isObject(o) && Array.isArray(o.nodes) && isObject(o.connections); }\n\nfunction tryParseBase64Json(s){\n  try {\n    const txt = Buffer.from(String(s).replace(/\\s+/g,''), 'base64').toString('utf8');\n    return JSON.parse(txt);\n  } catch { return null; }\n}\n\nfunction tryParseJson(s){\n  try { return JSON.parse(s); } catch { return null; }\n}\n\nfunction findWorkflowDeep(obj){\n  const stack = [{v: obj, p: '$'}];\n  while (stack.length){\n    const {v,p} = stack.pop();\n    if (looksLikeWorkflow(v)) return {wf: v, path: p};\n    if (Array.isArray(v)) v.forEach((el,i)=> stack.push({v: el, p: `${p}[${i}]`}));\n    else if (isObject(v)) for (const [k,val] of Object.entries(v)) stack.push({v: val, p: `${p}.${k}`});\n  }\n  return {wf: null, path: null};\n}\n\n// normalización ligera (quita campos volátiles y ordena claves)\nconst VOLATILE_TOP = new Set(['id','createdAt','updatedAt','versionId','meta','hash','staticData']);\nconst VOLATILE_NODE = new Set(['id','createdAt','updatedAt','position','notes','notesInFlow']);\nfunction deepSort(obj){\n  if (Array.isArray(obj)) return obj.map(deepSort);\n  if (!isObject(obj)) return obj;\n  const out = {};\n  for (const k of Object.keys(obj).sort()) out[k] = deepSort(obj[k]);\n  return out;\n}\nfunction stripVolatile(wf){\n  if (!wf || !isObject(wf)) return wf;\n  const c = JSON.parse(JSON.stringify(wf));\n  for (const k of VOLATILE_TOP) delete c[k];\n  if (Array.isArray(c.nodes)){\n    c.nodes = c.nodes.map(n=>{\n      const nn = {...n};\n      for (const k of VOLATILE_NODE) delete nn[k];\n      if (nn.credentials && isObject(nn.credentials)) nn.credentials = deepSort(nn.credentials);\n      if (nn.parameters) nn.parameters = deepSort(nn.parameters);\n      return nn;\n    });\n  }\n  return deepSort(c);\n}\nfunction same(a,b){ return JSON.stringify(a) === JSON.stringify(b); }\n\nfunction slug(s){\n  return String(s||'workflow')\n    .normalize('NFD').replace(/[\\u0300-\\u036f]/g,'')\n    .replace(/[^a-zA-Z0-9-_]+/g,'-')\n    .replace(/-+/g,'-')\n    .replace(/^-|-$/g,'')\n    .toLowerCase();\n}\n\n// === Por item ===\nreturn items.map(item=>{\n  const j = item.json || {};\n\n  // 1) LOCAL: viene del loop \"Get many workflows\" (o anidado tras Merge)\n  let local = j.localWorkflow || j.workflow || (looksLikeWorkflow(j) ? j : null);\n  if (!local){\n    // buscar profundo (por si el Merge dejó el objeto dentro de otra clave)\n    local = findWorkflowDeep(j).wf;\n  }\n  if (!local){\n    return { json: { accion: -1, estado: 'error', mensaje: 'No se detectó workflow LOCAL en el item.', debugKeys: Object.keys(j) } };\n  }\n\n  // 2) REMOTO: viene del nodo \"Get a file\" de GitHub (tras Merge)\n  //   GitHub GET /contents devuelve { content: <base64>, encoding: 'base64', sha, path, ... }\n  let remote = null;\n  let sha = j.sha || null;\n  if (!remote && typeof j.content === 'string' && /base64/i.test(j.encoding||'')) {\n    remote = tryParseBase64Json(j.content);\n  } else {\n    // Si el Merge dejó la respuesta de GitHub bajo otra clave, busca un subobjeto con content+encoding\n    const stack = [{v:j,p:'$'}];\n    while (!remote && stack.length){\n      const {v} = stack.pop();\n      if (v && typeof v === 'object' && !Array.isArray(v)){\n        if (typeof v.content === 'string' && /base64/i.test(v.encoding||'')){\n          const parsed = tryParseBase64Json(v.content);\n          if (looksLikeWorkflow(parsed)) { remote = parsed; sha = v.sha || sha || null; break; }\n        }\n        for (const val of Object.values(v)) stack.push({v:val});\n      }\n    }\n    // fallback: si alguien guardó el JSON como string\n    if (!remote){\n      for (const val of Object.values(j)){\n        if (typeof val === 'string'){\n          const parsed = tryParseJson(val) || tryParseBase64Json(val);\n          if (looksLikeWorkflow(parsed)) { remote = parsed; break; }\n        }\n      }\n    }\n  }\n\n  // 3) Normalizar para comparar\n  const normLocal  = stripVolatile(local);\n  const normRemote = remote ? stripVolatile(remote) : null;\n\n  // 4) Decisión\n  let accion, estado;\n  if (!normRemote){ accion = 2; estado = 'crear'; }\n  else if (same(normLocal, normRemote)){ accion = 0; estado = 'igual'; }\n  else { accion = 1; estado = 'diferente'; }\n\n  // 5) Preparar salida EXACTA que esperan tus nodos GitHub\n  const nombre = slug(local.name || local.id || 'workflow');\n  const filePath = `workflows/${nombre}.json`;\n  const n8n_data_stringy = Buffer.from(JSON.stringify(normLocal, null, 2)).toString('base64');\n\n  return {\n    json: {\n      accion,                 // 0 = no-op, 1 = editar, 2 = crear\n      estado,\n      filePath,               // → Path en GitHub\n      n8n_data_stringy,       // → File Content (Base64)\n      sha: sha || undefined,  // si existe, se usa en \"Edit a file\"\n      payloadToCommit: normLocal\n    }\n  };\n});\n"
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 12
+            }
+          ]
+        }
       },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2
     },
     {
       "name": "Switch1",
@@ -237,6 +303,28 @@
         "options": {},
         "rules": {
           "values": [
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "2ecb2e0e-af9d-4cce-9d0f-264b33506246",
+                    "leftValue": "={{$json[\"accion\"]}}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "number"
+                    },
+                    "rightValue": 2
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                }
+              }
+            },
             {
               "conditions": {
                 "combinator": "and",
@@ -280,28 +368,6 @@
                   "version": 2
                 }
               }
-            },
-            {
-              "conditions": {
-                "combinator": "and",
-                "conditions": [
-                  {
-                    "id": "2ecb2e0e-af9d-4cce-9d0f-264b33506246",
-                    "leftValue": "={{$json[\"accion\"]}}",
-                    "operator": {
-                      "operation": "equals",
-                      "type": "number"
-                    },
-                    "rightValue": 2
-                  }
-                ],
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 2
-                }
-              }
             }
           ]
         }
@@ -310,34 +376,14 @@
       "typeVersion": 3.2
     },
     {
-      "credentials": {
-        "githubApi": {
-          "id": "0oW4lU9Qr31YmzID",
-          "name": "GitHub account"
-        }
-      },
-      "name": "Get a file1",
-      "onError": "continueRegularOutput",
+      "name": "Variables1",
       "parameters": {
-        "additionalParameters": {},
-        "asBinaryProperty": false,
-        "filePath": "={{ $json[\"filePath\"] }}",
-        "operation": "get",
-        "owner": {
-          "__rl": true,
-          "mode": "name",
-          "value": "joelrandolifarrando-hash"
-        },
-        "repository": {
-          "__rl": true,
-          "mode": "name",
-          "value": "n8n_back"
-        },
-        "resource": "file"
+        "jsonOutput": "{\n  \"repo\": {\n    \"owner\": \"joelrandolifarrandoli-hash\",\n    \"name\": \"n8n_back\",\n    \"branch\": \"main\",\n    \"path\": \"workflows\"\n  }\n}\n",
+        "mode": "raw",
+        "options": {}
       },
-      "type": "n8n-nodes-base.github",
-      "typeVersion": 1.1,
-      "webhookId": "4877ee34-bc78-45fa-9471-7f325b186b4c"
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4
     }
   ],
   "pinData": {},
