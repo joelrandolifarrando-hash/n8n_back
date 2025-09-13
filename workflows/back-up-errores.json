@@ -1,12 +1,12 @@
 {
   "active": false,
   "connections": {
-    "Code in JavaScript": {
+    "Code in JavaScript1": {
       "main": [
         [
           {
             "index": 0,
-            "node": "Switch",
+            "node": "Switch1",
             "type": "main"
           }
         ]
@@ -17,117 +17,100 @@
         [
           {
             "index": 0,
-            "node": "Loop Over Items",
+            "node": "Loop Over Items1",
             "type": "main"
           }
         ]
       ]
     },
-    "Edit a file": {
+    "Get a file1": {
       "main": [
         [
           {
             "index": 0,
-            "node": "Loop Over Items",
+            "node": "Merge1",
             "type": "main"
           }
         ]
       ]
     },
-    "Get a file": {
+    "Get many workflows1": {
       "main": [
         [
           {
             "index": 0,
-            "node": "Merge",
+            "node": "Loop Over Items1",
             "type": "main"
           }
         ]
       ]
     },
-    "Get many workflows": {
-      "main": [
-        [
-          {
-            "index": 0,
-            "node": "Loop Over Items",
-            "type": "main"
-          }
-        ]
-      ]
-    },
-    "Loop Over Items": {
+    "Loop Over Items1": {
       "main": [
         [
           {
             "index": 1,
-            "node": "Merge",
+            "node": "Merge1",
             "type": "main"
           },
           {
             "index": 0,
-            "node": "Get a file",
+            "node": "Get a file1",
             "type": "main"
           }
         ],
         [
           {
             "index": 0,
-            "node": "Replace Me",
+            "node": "Replace Me1",
             "type": "main"
           }
         ]
       ]
     },
-    "Merge": {
+    "Merge1": {
       "main": [
         [
           {
             "index": 0,
-            "node": "Code in JavaScript",
+            "node": "Code in JavaScript1",
             "type": "main"
           }
         ]
       ]
     },
-    "Replace Me": {
+    "Replace Me1": {
       "main": [
         [
           {
             "index": 0,
-            "node": "Loop Over Items",
+            "node": "Loop Over Items1",
             "type": "main"
           }
         ]
       ]
     },
-    "Schedule Trigger": {
+    "Schedule Trigger1": {
       "main": [
         [
           {
             "index": 0,
-            "node": "Variables",
+            "node": "Variables1",
             "type": "main"
           }
         ]
       ]
     },
-    "Switch": {
+    "Switch1": {
       "main": [
         [
           {
             "index": 0,
-            "node": "Loop Over Items",
+            "node": "Loop Over Items1",
             "type": "main"
           }
         ],
-        [
-          {
-            "index": 0,
-            "node": "Edit a file",
-            "type": "main"
-          }
-        ],
+        [],
         [
           {
             "index": 0,
@@ -137,12 +120,12 @@
         ]
       ]
     },
-    "Variables": {
+    "Variables1": {
       "main": [
         [
           {
             "index": 0,
-            "node": "Get many workflows",
+            "node": "Get many workflows1",
             "type": "main"
           }
         ]
@@ -153,7 +136,35 @@
   "name": "Back up errores",
   "nodes": [
     {
-      "name": "Schedule Trigger",
+      "credentials": {
+        "githubApi": {
+          "id": "0oW4lU9Qr31YmzID",
+          "name": "GitHub account"
+        }
+      },
+      "name": "Create a file",
+      "parameters": {
+        "commitMessage": "=feat(n8n): add {{ $json[\"filePath\"] }}",
+        "fileContent": "={{ $json[\"n8n_data_stringy\"] }}",
+        "filePath": "={{ $json[\"filePath\"] }}",
+        "owner": {
+          "__rl": true,
+          "mode": "name",
+          "value": "joelrandolifarrando-hash"
+        },
+        "repository": {
+          "__rl": true,
+          "mode": "name",
+          "value": "n8n_back"
+        },
+        "resource": "file"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "webhookId": "6c02b6cd-2487-43dd-b220-a966bcd42cda"
+    },
+    {
+      "name": "Schedule Trigger1",
       "parameters": {
         "rule": {
           "interval": [
@@ -168,7 +179,7 @@
       "typeVersion": 1.2
     },
     {
-      "name": "Variables",
+      "name": "Variables1",
       "parameters": {
         "jsonOutput": "{\n  \"repo\": {\n    \"owner\": \"joelrandolifarrandoli-hash\",\n    \"name\": \"n8n_back\",\n    \"branch\": \"main\",\n    \"path\": \"workflows\"\n  }\n}\n",
         "mode": "raw",
@@ -184,7 +195,7 @@
           "name": "n8n account"
         }
       },
-      "name": "Get many workflows",
+      "name": "Get many workflows1",
       "parameters": {
         "filters": {},
         "requestOptions": {}
@@ -193,7 +204,7 @@
       "typeVersion": 1
     },
     {
-      "name": "Loop Over Items",
+      "name": "Loop Over Items1",
       "parameters": {
         "options": {}
       },
@@ -201,27 +212,27 @@
       "typeVersion": 3
     },
     {
-      "name": "Replace Me",
+      "name": "Replace Me1",
       "parameters": {},
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1
     },
     {
-      "name": "Merge",
+      "name": "Merge1",
       "parameters": {},
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2
     },
     {
-      "name": "Code in JavaScript",
+      "name": "Code in JavaScript1",
       "parameters": {
-        "jsCode": "// ========== CONFIG ==========\nconst BRANCH = 'main'; // por si quieres exponerlo en la salida\n\n// ========== Utils ==========\nfunction isObject(v){ return v && typeof v === 'object' && !Array.isArray(v); }\nfunction looksLikeWorkflow(o){ return o && isObject(o) && Array.isArray(o.nodes) && isObject(o.connections); }\nfunction tryParseJson(s){ try { return JSON.parse(s); } catch { return null; } }\nfunction tryParseBase64Json(s){\n  try {\n    const txt = Buffer.from(String(s).replace(/\\s+/g,''), 'base64').toString('utf8');\n    return JSON.parse(txt);\n  } catch { return null; }\n}\nfunction slug(s){\n  return String(s||'workflow')\n    .normalize('NFD').replace(/[\\u0300-\\u036f]/g,'')\n    .replace(/[^a-zA-Z0-9-_]+/g,'-')\n    .replace(/-+/g,'-')\n    .replace(/^-|-$/g,'')\n    .toLowerCase();\n}\n\n// Campos volátiles típicos de n8n que no queremos versionar\nconst VOLATILE_TOP = new Set(['id','createdAt','updatedAt','versionId','meta','hash','staticData']);\nconst VOLATILE_NODE = new Set(['id','createdAt','updatedAt','position','notes','notesInFlow']);\n\nfunction deepSort(obj){\n  if (Array.isArray(obj)) return obj.map(deepSort);\n  if (!isObject(obj)) return obj;\n  const out = {};\n  for (const k of Object.keys(obj).sort()) out[k] = deepSort(obj[k]);\n  return out;\n}\nfunction stripVolatile(wf){\n  if (!wf || !isObject(wf)) return wf;\n  const c = JSON.parse(JSON.stringify(wf));\n  for (const k of VOLATILE_TOP) delete c[k];\n  if (Array.isArray(c.nodes)){\n    c.nodes = c.nodes.map(n=>{\n      const nn = {...n};\n      for (const k of VOLATILE_NODE) delete nn[k];\n      if (nn.credentials && isObject(nn.credentials)) nn.credentials = deepSort(nn.credentials);\n      if (nn.parameters) nn.parameters = deepSort(nn.parameters);\n      return nn;\n    });\n  }\n  return deepSort(c);\n}\nfunction same(a,b){ return JSON.stringify(a) === JSON.stringify(b); }\n\n// Busca el primer objeto con forma de workflow en profundidad (para el LOCAL)\nfunction findWorkflowDeep(obj){\n  const stack = [{v: obj, p: '$'}];\n  while (stack.length){\n    const {v,p} = stack.pop();\n    if (looksLikeWorkflow(v)) return {wf: v, path: p};\n    if (Array.isArray(v)) v.forEach((el,i)=> stack.push({v: el, p: `${p}[${i}]`}));\n    else if (isObject(v)) for (const [k,val] of Object.entries(v)) stack.push({v: val, p: `${p}.${k}`});\n  }\n  return {wf: null, path: null};\n}\n\n// Extrae REMOTO SOLO si viene con señales de GitHub (content+encoding base64) o explícito\nfunction extractRemoteFromMerged(root){\n  // a) explícito por convención\n  if (root && looksLikeWorkflow(root.githubWorkflow)) {\n    return { wf: root.githubWorkflow, sha: root.sha || null, source: '$.githubWorkflow' };\n  }\n  if (root && typeof root.githubWorkflow === 'string'){\n    const parsed = tryParseJson(root.githubWorkflow) || tryParseBase64Json(root.githubWorkflow);\n    if (looksLikeWorkflow(parsed)) return { wf: parsed, sha: root.sha || null, source: '$.githubWorkflow(string)' };\n  }\n\n  // b) buscar sub-objeto con {content: <base64>, encoding: 'base64'} (respuesta /contents de GitHub)\n  const stack = [root];\n  while (stack.length){\n    const v = stack.pop();\n    if (v && typeof v === 'object' && !Array.isArray(v)){\n      if (typeof v.content === 'string' && /base64/i.test(v.encoding||'')){\n        const parsed = tryParseBase64Json(v.content);\n        if (looksLikeWorkflow(parsed)) {\n          return { wf: parsed, sha: (typeof v.sha==='string'? v.sha : null), source: 'github.contents' };\n        }\n      }\n      for (const val of Object.values(v)) stack.push(val);\n    }\n  }\n  return { wf: null, sha: null, source: null };\n}\n\n// ========== MAIN ==========\nreturn items.map(item=>{\n  const j = item.json || {};\n\n  // --- LOCAL ---\n  let local = j.localWorkflow || j.workflow || (looksLikeWorkflow(j) ? j : null);\n  if (!local){\n    const fl = findWorkflowDeep(j);\n    local = fl.wf;\n  }\n  if (!local){\n    return { json: { accion: -1, estado: 'error', mensaje: 'No se detectó workflow LOCAL en el item.', debugKeys: Object.keys(j) } };\n  }\n\n  // --- REMOTO (solo GitHub válido) ---\n  const { wf: remoteWF, sha: shaFromRemote, source: remoteSource } = extractRemoteFromMerged(j);\n  const normLocal  = stripVolatile(local);\n  const normRemote = remoteWF ? stripVolatile(remoteWF) : null;\n\n  // --- DECISIÓN (robusta con SHA) ---\n  let accion, estado;\n  let sha = shaFromRemote || j.sha || null;\n  const shaOk = (typeof sha === 'string') && /^[0-9a-f]{40}$/i.test(sha);\n\n  if (!normRemote) {\n    accion = 2; estado = 'crear';\n  } else if (same(normLocal, normRemote)) {\n    accion = 0; estado = 'igual';\n  } else {\n    // Solo edita si tenemos SHA válido; si no, crea (evita 422 \"sha wasn't supplied\")\n    if (shaOk) { accion = 1; estado = 'diferente'; }\n    else       { accion = 2; estado = 'crear'; sha = null; }\n  }\n\n  // --- SALIDA para los nodos GitHub ---\n  const nombre = slug(local.name || local.id || 'workflow');\n  const filePath = `workflows/${nombre}.json`;\n  const n8n_data_stringy = Buffer.from(JSON.stringify(normLocal, null, 2)).toString('base64');\n\n  return {\n    json: {\n      accion,                 // 0=no-op, 1=editar, 2=crear, -1=error\n      estado,\n      filePath,               // → Path en GitHub\n      n8n_data_stringy,       // → File Content (Base64)\n      sha: sha || undefined,  // → solo existirá si el fichero ya existe y tenemos SHA válido\n      branch: BRANCH,         // por si quieres referenciarlo en los nodos\n      debug: { remoteSource }\n    }\n  };\n});\n"
+        "jsCode": "// === Helpers ===\nfunction isObject(v){ return v && typeof v === 'object' && !Array.isArray(v); }\nfunction looksLikeWorkflow(o){ return o && isObject(o) && Array.isArray(o.nodes) && isObject(o.connections); }\n\nfunction tryParseBase64Json(s){\n  try {\n    const txt = Buffer.from(String(s).replace(/\\s+/g,''), 'base64').toString('utf8');\n    return JSON.parse(txt);\n  } catch { return null; }\n}\n\nfunction tryParseJson(s){\n  try { return JSON.parse(s); } catch { return null; }\n}\n\nfunction findWorkflowDeep(obj){\n  const stack = [{v: obj, p: '$'}];\n  while (stack.length){\n    const {v,p} = stack.pop();\n    if (looksLikeWorkflow(v)) return {wf: v, path: p};\n    if (Array.isArray(v)) v.forEach((el,i)=> stack.push({v: el, p: `${p}[${i}]`}));\n    else if (isObject(v)) for (const [k,val] of Object.entries(v)) stack.push({v: val, p: `${p}.${k}`});\n  }\n  return {wf: null, path: null};\n}\n\n// normalización ligera (quita campos volátiles y ordena claves)\nconst VOLATILE_TOP = new Set(['id','createdAt','updatedAt','versionId','meta','hash','staticData']);\nconst VOLATILE_NODE = new Set(['id','createdAt','updatedAt','position','notes','notesInFlow']);\nfunction deepSort(obj){\n  if (Array.isArray(obj)) return obj.map(deepSort);\n  if (!isObject(obj)) return obj;\n  const out = {};\n  for (const k of Object.keys(obj).sort()) out[k] = deepSort(obj[k]);\n  return out;\n}\nfunction stripVolatile(wf){\n  if (!wf || !isObject(wf)) return wf;\n  const c = JSON.parse(JSON.stringify(wf));\n  for (const k of VOLATILE_TOP) delete c[k];\n  if (Array.isArray(c.nodes)){\n    c.nodes = c.nodes.map(n=>{\n      const nn = {...n};\n      for (const k of VOLATILE_NODE) delete nn[k];\n      if (nn.credentials && isObject(nn.credentials)) nn.credentials = deepSort(nn.credentials);\n      if (nn.parameters) nn.parameters = deepSort(nn.parameters);\n      return nn;\n    });\n  }\n  return deepSort(c);\n}\nfunction same(a,b){ return JSON.stringify(a) === JSON.stringify(b); }\n\nfunction slug(s){\n  return String(s||'workflow')\n    .normalize('NFD').replace(/[\\u0300-\\u036f]/g,'')\n    .replace(/[^a-zA-Z0-9-_]+/g,'-')\n    .replace(/-+/g,'-')\n    .replace(/^-|-$/g,'')\n    .toLowerCase();\n}\n\n// === Por item ===\nreturn items.map(item=>{\n  const j = item.json || {};\n\n  // 1) LOCAL: viene del loop \"Get many workflows\" (o anidado tras Merge)\n  let local = j.localWorkflow || j.workflow || (looksLikeWorkflow(j) ? j : null);\n  if (!local){\n    // buscar profundo (por si el Merge dejó el objeto dentro de otra clave)\n    local = findWorkflowDeep(j).wf;\n  }\n  if (!local){\n    return { json: { accion: -1, estado: 'error', mensaje: 'No se detectó workflow LOCAL en el item.', debugKeys: Object.keys(j) } };\n  }\n\n  // 2) REMOTO: viene del nodo \"Get a file\" de GitHub (tras Merge)\n  //   GitHub GET /contents devuelve { content: <base64>, encoding: 'base64', sha, path, ... }\n  let remote = null;\n  let sha = j.sha || null;\n  if (!remote && typeof j.content === 'string' && /base64/i.test(j.encoding||'')) {\n    remote = tryParseBase64Json(j.content);\n  } else {\n    // Si el Merge dejó la respuesta de GitHub bajo otra clave, busca un subobjeto con content+encoding\n    const stack = [{v:j,p:'$'}];\n    while (!remote && stack.length){\n      const {v} = stack.pop();\n      if (v && typeof v === 'object' && !Array.isArray(v)){\n        if (typeof v.content === 'string' && /base64/i.test(v.encoding||'')){\n          const parsed = tryParseBase64Json(v.content);\n          if (looksLikeWorkflow(parsed)) { remote = parsed; sha = v.sha || sha || null; break; }\n        }\n        for (const val of Object.values(v)) stack.push({v:val});\n      }\n    }\n    // fallback: si alguien guardó el JSON como string\n    if (!remote){\n      for (const val of Object.values(j)){\n        if (typeof val === 'string'){\n          const parsed = tryParseJson(val) || tryParseBase64Json(val);\n          if (looksLikeWorkflow(parsed)) { remote = parsed; break; }\n        }\n      }\n    }\n  }\n\n  // 3) Normalizar para comparar\n  const normLocal  = stripVolatile(local);\n  const normRemote = remote ? stripVolatile(remote) : null;\n\n  // 4) Decisión\n  let accion, estado;\n  if (!normRemote){ accion = 2; estado = 'crear'; }\n  else if (same(normLocal, normRemote)){ accion = 0; estado = 'igual'; }\n  else { accion = 1; estado = 'diferente'; }\n\n  // 5) Preparar salida EXACTA que esperan tus nodos GitHub\n  const nombre = slug(local.name || local.id || 'workflow');\n  const filePath = `workflows/${nombre}.json`;\n  const n8n_data_stringy = Buffer.from(JSON.stringify(normLocal, null, 2)).toString('base64');\n\n  return {\n    json: {\n      accion,                 // 0 = no-op, 1 = editar, 2 = crear\n      estado,\n      filePath,               // → Path en GitHub\n      n8n_data_stringy,       // → File Content (Base64)\n      sha: sha || undefined,  // si existe, se usa en \"Edit a file\"\n      payloadToCommit: normLocal\n    }\n  };\n});\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2
     },
     {
-      "name": "Switch",
+      "name": "Switch1",
       "parameters": {
         "options": {},
         "rules": {
@@ -305,48 +316,17 @@
           "name": "GitHub account"
         }
       },
-      "name": "Edit a file",
-      "parameters": {
-        "commitMessage": "=chore(n8n): update {{ $json[\"filePath\"] }}",
-        "fileContent": "={{ $json[\"n8n_data_stringy\"] }}\n",
-        "filePath": "=={{ \n  'workflows/' + (\n    ($json[\"name\"] || $json[\"id\"] || 'workflow')\n      .toString()\n      .normalize('NFD').replace(/[\\u0300-\\u036f]/g,'')\n      .replace(/[^a-zA-Z0-9-_]+/g,'-')\n      .replace(/-+/g,'-')\n      .replace(/^-|-$/g,'')\n      .toLowerCase()\n  ) + '.json' \n}}\n",
-        "operation": "edit",
-        "owner": {
-          "__rl": true,
-          "mode": "name",
-          "value": "joelrandolifarrando-hash"
-        },
-        "repository": {
-          "__rl": true,
-          "mode": "name",
-          "value": "n8n_back"
-        },
-        "resource": "file"
-      },
-      "type": "n8n-nodes-base.github",
-      "typeVersion": 1.1,
-      "webhookId": "5f73a4ad-c857-4e8e-a05b-102120203f2f"
-    },
-    {
-      "credentials": {
-        "githubApi": {
-          "id": "0oW4lU9Qr31YmzID",
-          "name": "GitHub account"
-        }
-      },
-      "name": "Get a file",
+      "name": "Get a file1",
       "onError": "continueRegularOutput",
       "parameters": {
-        "additionalParameters": {
-          "reference": "=main"
-        },
+        "additionalParameters": {},
         "asBinaryProperty": false,
-        "filePath": "=={{ \n  'workflows/' + (\n    ($json[\"name\"] || $json[\"id\"] || 'workflow')\n      .toString()\n      .normalize('NFD').replace(/[\\u0300-\\u036f]/g,'')\n      .replace(/[^a-zA-Z0-9-_]+/g,'-')\n      .replace(/-+/g,'-')\n      .replace(/^-|-$/g,'')\n      .toLowerCase()\n  ) + '.json' \n}}\n",
+        "filePath": "={{ $json[\"filePath\"] }}",
         "operation": "get",
         "owner": {
           "__rl": true,
           "mode": "name",
-          "value": "=joelrandolifarrando-hash"
+          "value": "joelrandolifarrando-hash"
         },
         "repository": {
           "__rl": true,
@@ -358,39 +338,6 @@
       "type": "n8n-nodes-base.github",
       "typeVersion": 1.1,
       "webhookId": "4877ee34-bc78-45fa-9471-7f325b186b4c"
-    },
-    {
-      "credentials": {
-        "githubApi": {
-          "id": "0oW4lU9Qr31YmzID",
-          "name": "GitHub account"
-        }
-      },
-      "name": "Create a file",
-      "parameters": {
-        "additionalParameters": {
-          "branch": {
-            "branch": "main"
-          }
-        },
-        "commitMessage": "=feat(n8n): add {{ $json[\"filePath\"] }}",
-        "fileContent": "={{ $json[\"n8n_data_stringy\"] }}",
-        "filePath": "=={{ \n  'workflows/' + (\n    ($json[\"name\"] || $json[\"id\"] || 'workflow')\n      .toString()\n      .normalize('NFD').replace(/[\\u0300-\\u036f]/g,'')\n      .replace(/[^a-zA-Z0-9-_]+/g,'-')\n      .replace(/-+/g,'-')\n      .replace(/^-|-$/g,'')\n      .toLowerCase()\n  ) + '.json' \n}}\n",
-        "owner": {
-          "__rl": true,
-          "mode": "name",
-          "value": "joelrandolifarrando-hash"
-        },
-        "repository": {
-          "__rl": true,
-          "mode": "name",
-          "value": "n8n_back"
-        },
-        "resource": "file"
-      },
-      "type": "n8n-nodes-base.github",
-      "typeVersion": 1.1,
-      "webhookId": "6c02b6cd-2487-43dd-b220-a966bcd42cda"
     }
   ],
   "pinData": {},
