@@ -12,16 +12,6 @@
         ]
       ]
     },
-    "Create a file": {
-      "main": [
-        []
-      ]
-    },
-    "Edit a file1": {
-      "main": [
-        []
-      ]
-    },
     "Get a file1": {
       "main": [
         [
@@ -102,7 +92,6 @@
     },
     "Switch1": {
       "main": [
-        [],
         [
           {
             "index": 0,
@@ -131,7 +120,6 @@
       ]
     }
   },
-  "isArchived": false,
   "name": "Back up errores",
   "nodes": [
     {
@@ -201,7 +189,6 @@
       "name": "Get a file1",
       "onError": "continueRegularOutput",
       "parameters": {
-        "additionalParameters": {},
         "asBinaryProperty": false,
         "filePath": "={{ $('Variables1').item.json.repo.path }}",
         "operation": "get",
@@ -229,10 +216,6 @@
         }
       },
       "name": "Get many workflows1",
-      "parameters": {
-        "filters": {},
-        "requestOptions": {}
-      },
       "type": "n8n-nodes-base.n8n",
       "typeVersion": 1
     },
@@ -246,21 +229,16 @@
     },
     {
       "name": "Loop Over Items1",
-      "parameters": {
-        "options": {}
-      },
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3
     },
     {
       "name": "Merge1",
-      "parameters": {},
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2
     },
     {
       "name": "Replace Me1",
-      "parameters": {},
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1
     },
@@ -282,7 +260,6 @@
     {
       "name": "Switch1",
       "parameters": {
-        "options": {},
         "rules": {
           "values": [
             {
@@ -301,7 +278,6 @@
                 ],
                 "options": {
                   "caseSensitive": true,
-                  "leftValue": "",
                   "typeValidation": "strict",
                   "version": 2
                 }
@@ -323,7 +299,6 @@
                 ],
                 "options": {
                   "caseSensitive": true,
-                  "leftValue": "",
                   "typeValidation": "strict",
                   "version": 2
                 }
@@ -345,7 +320,6 @@
                 ],
                 "options": {
                   "caseSensitive": true,
-                  "leftValue": "",
                   "typeValidation": "strict",
                   "version": 2
                 }
@@ -361,17 +335,12 @@
       "name": "Variables1",
       "parameters": {
         "jsonOutput": "{\n  \"repo\": {\n    \"owner\": \"joelrandolifarrandoli-hash\",\n    \"name\": \"n8n_back\",\n    \"branch\": \"main\",\n    \"path\": \"workflows\"\n  }\n}\n",
-        "mode": "raw",
-        "options": {}
+        "mode": "raw"
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4
     }
   ],
-  "pinData": {},
-  "settings": {
-    "executionOrder": "v1"
-  },
   "shared": [
     {
       "createdAt": "2025-09-09T09:16:49.880Z",
@@ -381,6 +350,5 @@
       "workflowId": "gCpWThAhPhewWYaK"
     }
   ],
-  "tags": [],
   "triggerCount": 0
 }
