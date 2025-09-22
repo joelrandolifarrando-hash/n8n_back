@@ -1,0 +1,164 @@
+{
+  "active": false,
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "HTTP Request",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Information Extractor",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "index": 0,
+            "node": "Information Extractor",
+            "type": "ai_languageModel"
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Edit Fields",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "name": "[UDIA] Sub-worflow de extracionde datos",
+  "nodes": [
+    {
+      "credentials": {
+        "openAiApi": {
+          "id": "vHAQ3s2QFMjVRdaz",
+          "name": "OpenAi account"
+        }
+      },
+      "name": "OpenAI Chat Model",
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "cachedResultName": "gpt-4o-mini",
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2
+    },
+    {
+      "name": "Edit Fields",
+      "parameters": {
+        "jsonOutput": "{\n\"loc\": \n\"https://mascotalandia.es/26--natura-diet-daily-food-12kg-pienso-para-perros-con-pollo-y-arroz.html\",\n\"image:image\": \n{\n\"image:loc\": \n\"https://mascotalandia.es/38-large_default/natura-diet-daily-food-12kg-pienso-para-perros-con-pollo-y-arroz.jpg\"\n}\n}",
+        "mode": "raw"
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4
+    },
+    {
+      "name": "HTML",
+      "parameters": {
+        "extractionValues": {
+          "values": [
+            {
+              "cssSelector": ".brand_centercolumn",
+              "key": "marca"
+            },
+            {
+              "cssSelector": ".price_pvp",
+              "key": "pvp"
+            },
+            {
+              "cssSelector": ".product_name",
+              "key": "nombre"
+            },
+            {
+              "cssSelector": ".product-description",
+              "key": "descripcion_corta"
+            }
+          ]
+        },
+        "operation": "extractHtmlContent"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2
+    },
+    {
+      "name": "HTTP Request",
+      "parameters": {
+        "jsonHeaders": "{\n  \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36\",\n  \"Accept\": \"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\",\n  \"Accept-Language\": \"en-US,en;q=0.5\",\n  \"Connection\": \"keep-alive\"\n}\n",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "url": "={{ $json.loc }}"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "name": "Information Extractor",
+      "parameters": {
+        "attributes": {
+          "attributes": [
+            {
+              "description": "descripcion corta del producto",
+              "name": "Descripcion corta",
+              "required": true
+            },
+            {
+              "description": "Nombre del producto",
+              "name": "Nombre",
+              "required": true
+            },
+            {
+              "description": "precio del producto",
+              "name": "Precio",
+              "required": true
+            }
+          ]
+        },
+        "text": "=Extrae toda la informacion del producto que te envio en HTML. Tu debes devolver nombre, marca, descripcion corta y precio.\n {{ $json.data }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1
+    }
+  ],
+  "shared": [
+    {
+      "createdAt": "2025-09-16T11:30:02.872Z",
+      "projectId": "M3s0TPMuzmMgAN7B",
+      "role": "workflow:owner",
+      "updatedAt": "2025-09-16T11:30:02.872Z",
+      "workflowId": "3NUjrCS2Z9JoVqPb"
+    }
+  ],
+  "triggerCount": 0
+}
