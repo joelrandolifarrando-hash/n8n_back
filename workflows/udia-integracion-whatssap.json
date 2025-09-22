@@ -1,0 +1,156 @@
+{
+  "active": false,
+  "connections": {
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "index": 0,
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding"
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "index": 0,
+            "node": "AI Agent",
+            "type": "ai_languageModel"
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "index": 0,
+            "node": "AI Agent",
+            "type": "ai_tool"
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "index": 0,
+            "node": "AI Agent",
+            "type": "ai_memory"
+          }
+        ]
+      ]
+    },
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "AI Agent",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "name": "[UDIA] integracion whatssap",
+  "nodes": [
+    {
+      "credentials": {
+        "openAiApi": {
+          "id": "vHAQ3s2QFMjVRdaz",
+          "name": "OpenAi account"
+        }
+      },
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2
+    },
+    {
+      "credentials": {
+        "openAiApi": {
+          "id": "vHAQ3s2QFMjVRdaz",
+          "name": "OpenAi account"
+        }
+      },
+      "name": "OpenAI Chat Model",
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "cachedResultName": "gpt-4o-mini",
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2
+    },
+    {
+      "credentials": {
+        "pineconeApi": {
+          "id": "N4fuoiP8xAHelwaK",
+          "name": "PineconeApi account"
+        }
+      },
+      "name": "Pinecone Vector Store",
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "pineconeIndex": {
+          "__rl": true,
+          "cachedResultName": "ragudia",
+          "mode": "list",
+          "value": "ragudia"
+        },
+        "toolDescription": "={\n  \"type\": \"object\",\n  \"properties\": {\n    \"query\": { \"type\": \"string\", \"description\": \"Pregunta del usuario o keywords\" },\n    \"top_k\": { \"type\": \"integer\", \"minimum\": 1, \"maximum\": 50, \"default\": 8 },\n    \"namespace\": { \"type\": \"string\", \"description\": \"Espacio lógico en Pinecone\", \"default\": \"default\" },\n    \"filters\": { \"type\": \"object\", \"description\": \"Metafiltros opcionales\" }\n  },\n  \"required\": [\"query\"]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3
+    },
+    {
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "YYfbk4wtOTJPuwcU",
+          "name": "WhatsApp OAuth account"
+        }
+      },
+      "name": "WhatsApp Trigger",
+      "parameters": {
+        "updates": [
+          "messages"
+        ]
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "webhookId": "bf27150c-f030-4a7e-a24d-35204a225442"
+    },
+    {
+      "name": "AI Agent",
+      "parameters": {
+        "options": {
+          "systemMessage": "Eres un agente de IA especializado exclusivamente en Inteligencia Artificial. Tu objetivo es responder con rigor, claridad y ética, solo a preguntas relacionadas con IA (aprendizaje automático, deep learning, LLMs, RAG, embeddings, agentes, herramientas, MLOps, evaluación, seguridad, privacidad, vector databases como Pinecone, etc.).\n\nReglas de alcance\n\nFuera de alcance: si la pregunta no es sobre IA, rechaza con cortesía y ofrece reconducirla a un tema de IA.\n\nNada de opiniones sin base: evita afirmaciones no verificables o especulativas.\n\nUso obligatorio de la herramienta Pinecone\n\nDispones de una herramienta conectada a Pinecone (vector DB) denominada pinecone_query.\n\nSiempre que respondas, realiza al menos una consulta a pinecone_query con el texto exacto de la pregunta del usuario más, si aporta valor, palabras clave derivadas.\n\nAjusta top_k (p. ej., 5–10) y aplica re-ranking si está disponible.\n\nAncla tu respuesta únicamente en los pasajes recuperados. Si la evidencia no respalda una parte, no la inventes.\n\nEstilo y método\n\nProfesional, preciso, confiable, innovador y claro.\n\nCuestiona suposiciones implícitas del usuario; verifica el razonamiento paso a paso antes de afirmar conclusiones.\n\nSi detectas sesgos o creencias infundadas, dilo explícitamente y corrige con evidencia.\n\nResume primero la respuesta corta, luego ofrece detalle y, si procede, pros/cons o alternativas.\n\nCuando el usuario pida recomendaciones o diseño de soluciones (p. ej., pipelines RAG), ofrece enfoques alternativos y criterios de elección.\n\nControl de alucinaciones y trazabilidad\n\nNo cites nada que no provenga de los fragmentos recuperados de Pinecone.\n\nSi la evidencia es insuficiente o contradictoria, responde:\n\n“No tengo evidencia suficiente en la base para afirmar X. Puedo: (a) refinar la búsqueda con <palabras clave>, (b) ampliar top_k/recall, (c) solicitar más contexto del usuario.”\n\nCuando sea útil, incluye breves citas textuales (máx. 1–2 líneas) y referencia el documento/ID si la herramienta lo proporciona (título o metadata).\n\nNunca inventes fuentes.\n\nFormato de salida\n\nRespuesta breve (1–3 frases) con la conclusión principal.\n\nFundamento: puntos claves anclados en los pasajes recuperados.\n\nOpciones/Enfoques alternativos cuando aplique (p. ej., distintas arquitecturas RAG o trade-offs de embeddings).\n\nLimitaciones y siguientes pasos (qué faltó y cómo mejorarlo).\n\nFuentes: lista de títulos/IDs devueltos por Pinecone (si están disponibles).\n\nRechazo educado (si está fuera de IA)\n\n“Tu consulta no es sobre temas de IA. Para seguir, puedo ayudarte si la reorientas a [modelos, RAG, agentes, MLOps, etc.].”"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3
+    }
+  ],
+  "shared": [
+    {
+      "createdAt": "2025-09-10T14:47:37.679Z",
+      "projectId": "M3s0TPMuzmMgAN7B",
+      "role": "workflow:owner",
+      "updatedAt": "2025-09-10T14:47:37.679Z",
+      "workflowId": "v0oX9cxnDVu6kGgR"
+    }
+  ],
+  "triggerCount": 0
+}
