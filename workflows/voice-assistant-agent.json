@@ -1,0 +1,246 @@
+{
+  "active": false,
+  "connections": {
+    "Assistant Agent": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Reply in Telegram",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Check if Audio file": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Get a file",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Set field",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Transcribe audio",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "ai_memory": [
+        [
+          {
+            "index": 0,
+            "node": "Assistant Agent",
+            "type": "ai_memory"
+          }
+        ]
+      ]
+    },
+    "Model": {
+      "ai_languageModel": [
+        [
+          {
+            "index": 0,
+            "node": "Assistant Agent",
+            "type": "ai_languageModel"
+          }
+        ]
+      ]
+    },
+    "Set field": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Assistant Agent",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Telegram Message Trigger": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Check if Audio file",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Transcribe audio": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Assistant Agent",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "name": "Voice assistant agent",
+  "nodes": [
+    {
+      "name": "Assistant Agent",
+      "parameters": {
+        "options": {
+          "systemMessage": "=# Telegram Personal AI Assistant System Prompt\n\nYou are a helpful personal AI assistant that communicates with users through Telegram.\n\n## Your Capabilities\n\nYou can help users with:\n- **General conversation** - Answer questions and provide information\n\n## Communication Style\n\n### Response Format\n- Keep responses conversational and friendly\n- Use appropriate length for Telegram (not too long)\n- Be helpful and informative\n- Match the user's tone and communication style\n\n### Voice Message Handling\n- When users send voice messages, respond naturally as if they spoke to you directly\n- Don't mention that their message was transcribed\n- Respond in a conversational way that flows naturally\n\n\n## Context Awareness\n\n- Remember the current date and time: **Today is {{ $now.format('cccc') }} the {{ $now.format('yyyy-MM-dd HH:mm') }}**\n- Use this information to provide relevant, timely responses\n- Reference \"today\", \"tomorrow\", \"this week\" appropriately\n\n## Important Guidelines\n\n- Maintain conversation context using the memory system\n- Ask clarifying questions when requests are ambiguous\n- Respect privacy - only access information when relevant to the request\n- If you can't help with something, suggest alternatives or redirect to your available capabilities\n\nRemember: You're a personal assistant, so be personable, helpful, and focused on making the user's day easier and more organized.\n\nToday is {{ $now.format('cccc') }} the {{ $now.format('yyyy-MM-dd HH:mm') }}."
+        },
+        "promptType": "define",
+        "text": "={{ $json.text || $json.message.text }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2
+    },
+    {
+      "name": "Check if Audio file",
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "2b538077-d3d3-4713-b973-68748313ff97",
+              "leftValue": "={{ $json.message.voice }}",
+              "operator": {
+                "operation": "notEmpty",
+                "singleValue": true,
+                "type": "object"
+              }
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict",
+            "version": 2
+          }
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2
+    },
+    {
+      "name": "Get a file",
+      "parameters": {
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "resource": "file"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "webhookId": "e0769871-efe3-49da-81a5-2f88a6fdd33f"
+    },
+    {
+      "name": "Memory",
+      "parameters": {
+        "contextWindowLength": 10,
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Message Trigger').first().json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3
+    },
+    {
+      "name": "Model",
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "cachedResultName": "gpt-4.1-mini",
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2
+    },
+    {
+      "name": "Reply in Telegram",
+      "parameters": {
+        "chatId": "={{ $('Telegram Message Trigger').first().json.message.chat.id }}",
+        "text": "={{ $json.output }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "webhookId": "b96b7a41-9806-455f-b72e-00aa638eda71"
+    },
+    {
+      "name": "Set field",
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eb912219-2436-4f04-8ffc-c1c20eb07344",
+              "name": "text",
+              "type": "string",
+              "value": "={{ $json.message.text }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4
+    },
+    {
+      "name": "Sticky Note",
+      "parameters": {
+        "color": 5,
+        "content": "### Voice assistant agent\nPersonal AI assistant in Telegram, handling both text and voice messages.\n\n#### Set up\n- Configure credentials in the **Model** and **Telegram** nodes\n- Follow the bot creation steps in our [Telegram docs](https://docs.n8n.io/integrations/builtin/credentials/telegram/#supported-authentication-methods)\n- Add your user ID to the **Telegram Message Trigger** so only you can access it\n- Activate the workflow to receive messages from Telegram\n- Send a message to the agent\n\n#### Next steps\nTry giving the agent more tools, so that it can draft emails and calendar events for you from just a message.\n",
+        "height": 496,
+        "width": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1
+    },
+    {
+      "name": "Telegram Message Trigger",
+      "parameters": {
+        "additionalFields": {
+          "download": false,
+          "userIds": "YOUR_USER_ID"
+        },
+        "updates": [
+          "message"
+        ]
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "webhookId": "55acc711-c248-4ac9-b6cd-e295c2d33f4b"
+    },
+    {
+      "name": "Transcribe audio",
+      "parameters": {
+        "operation": "transcribe",
+        "resource": "audio"
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8
+    }
+  ],
+  "shared": [
+    {
+      "createdAt": "2025-09-22T08:58:53.268Z",
+      "projectId": "M3s0TPMuzmMgAN7B",
+      "role": "workflow:owner",
+      "updatedAt": "2025-09-22T08:58:53.268Z",
+      "workflowId": "v5w7F7thUqxJY812"
+    }
+  ],
+  "triggerCount": 0
+}
