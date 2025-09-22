@@ -1,0 +1,192 @@
+{
+  "active": false,
+  "connections": {
+    "Call '[UDIA] Sub-worflow'": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Loop Over Items",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "accedo al sistema",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Loop Over Items",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Call '[UDIA] Sub-worflow'",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Edit Fields",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "accedo al sistema": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "covierto a XML",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "covierto a XML": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "extraigo lo que necesito",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "extraigo lo que necesito": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Limit",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "name": "[UDIA] Nodo de extraccion de datos",
+  "nodes": [
+    {
+      "name": "accedo al sistema",
+      "parameters": {
+        "url": "={{ $json.sitemap }}"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "name": "Call '[UDIA] Sub-worflow'",
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "cachedResultName": "[UDIA] Sub-worflow",
+          "mode": "list",
+          "value": "3NUjrCS2Z9JoVqPb"
+        },
+        "workflowInputs": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true,
+          "mappingMode": "defineBelow",
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "[UDIA] Nodo de extraccion de datos",
+              "id": "[UDIA] Nodo de extraccion de datos",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2
+    },
+    {
+      "name": "covierto a XML",
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1
+    },
+    {
+      "name": "Edit Fields",
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "03a6b353-0d0d-461a-a3c9-2693d134558a",
+              "name": "sitemap",
+              "type": "string",
+              "value": "https://mascotalandia.es/sitemap-products-1-es.xml"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4
+    },
+    {
+      "name": "extraigo lo que necesito",
+      "parameters": {
+        "fieldToSplitOut": "urlset.url"
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1
+    },
+    {
+      "name": "Limit",
+      "parameters": {
+        "maxItems": 10
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3
+    },
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1
+    }
+  ],
+  "shared": [
+    {
+      "createdAt": "2025-09-16T11:18:11.823Z",
+      "projectId": "M3s0TPMuzmMgAN7B",
+      "role": "workflow:owner",
+      "updatedAt": "2025-09-16T11:18:11.823Z",
+      "workflowId": "HAfiscFxGyYpNoG0"
+    }
+  ],
+  "triggerCount": 0
+}
